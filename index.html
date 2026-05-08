@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Organizador</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-tertiary: #eeede9;
+      --text-primary: #1a1a18;
+      --text-secondary: #6b6b66;
+      --text-tertiary: #9e9e99;
+      --border-light: rgba(0,0,0,0.10);
+      --border-mid: rgba(0,0,0,0.18);
+      --border-strong: rgba(0,0,0,0.28);
+      --green-bg: #eaf3de;
+      --green-text: #3b6d11;
+      --red-bg: #fcebeb;
+      --red-text: #a32d2d;
+      --amber-bg: #faeeda;
+      --amber-text: #854f0b;
+      --blue-bg: #e6f1fb;
+      --blue-text: #185fa5;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1e1e1c;
+        --bg-secondary: #272724;
+        --bg-tertiary: #131312;
+        --text-primary: #f0efe9;
+        --text-secondary: #a0a09a;
+        --text-tertiary: #606060;
+        --border-light: rgba(255,255,255,0.08);
+        --border-mid: rgba(255,255,255,0.14);
+        --border-strong: rgba(255,255,255,0.22);
+        --green-bg: #173404;
+        --green-text: #c0dd97;
+        --red-bg: #501313;
+        --red-text: #f09595;
+        --amber-bg: #412402;
+        --amber-text: #fac775;
+        --blue-bg: #042c53;
+        --blue-text: #85b7eb;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .app {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 3rem;
+    }
+
+    .header {
+      padding: .5rem 0 1.25rem;
+    }
+
+    .header-eyebrow {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .header-date {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 5px;
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 5px;
+      margin-bottom: 1.25rem;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 9px 12px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: transparent;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-family: inherit;
+    }
+
+    .tab.active {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-weight: 500;
+      border: 0.5px solid var(--border-light);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .tab i { font-size: 16px; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: .75rem;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: .75rem;
+    }
+
+    .metric {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: .75rem 1rem;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    .metric-value {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .metric-value.green { color: var(--green-text); }
+    .metric-value.red { color: var(--red-text); }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: .75rem;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    input, select {
+      flex: 1;
+      font-size: 14px;
+      padding: 8px 11px;
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: inherit;
+      min-width: 0;
+      transition: border-color .1s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--border-strong);
+    }
+
+    input::placeholder { color: var(--text-tertiary); }
+
+    .btn {
+      padding: 8px 14px;
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all .1s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn:hover { background: var(--bg-secondary); }
+    .btn:active { transform: scale(.98); }
+    .btn-icon { padding: 7px 9px; min-width: 34px; justify-content: center; }
+
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: .85rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 5px 12px;
+      font-size: 12px;
+      border: 0.5px solid var(--border-light);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all .1s;
+      font-family: inherit;
+    }
+
+    .filter-btn.active {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border-color: var(--border-mid);
+      font-weight: 500;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--border-light);
+    }
+
+    .task-item:last-child { border-bottom: none; }
+
+    .task-check {
+      width: 19px;
+      height: 19px;
+      border-radius: 5px;
+      border: 1.5px solid var(--border-mid);
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .12s;
+      background: transparent;
+    }
+
+    .task-check.done {
+      background: var(--green-bg);
+      border-color: var(--green-text);
+    }
+
+    .task-check i { font-size: 12px; color: var(--green-text); }
+
+    .task-text {
+      flex: 1;
+      font-size: 14px;
+      color: var(--text-primary);
+      transition: all .15s;
+    }
+
+    .task-text.done {
+      text-decoration: line-through;
+      color: var(--text-tertiary);
+    }
+
+    .priority-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .p-alta { background: var(--red-bg); color: var(--red-text); }
+    .p-media { background: var(--amber-bg); color: var(--amber-text); }
+    .p-baixa { background: var(--green-bg); color: var(--green-text); }
+
+    .del-btn {
+      color: var(--text-tertiary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 5px;
+      border-radius: 5px;
+      transition: color .1s;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .del-btn:hover { color: var(--red-text); }
+
+    .month-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .month-nav span {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      flex: 1;
+      text-align: center;
+    }
+
+    .fin-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--border-light);
+    }
+
+    .fin-item:last-child { border-bottom: none; }
+
+    .fin-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 17px;
+    }
+
+    .fin-info { flex: 1; min-width: 0; }
+    .fin-desc { font-size: 14px; color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fin-cat-label { font-size: 12px; color: var(--text-secondary); }
+
+    .fin-value { font-size: 14px; font-weight: 500; white-space: nowrap; }
+    .fin-value.receita { color: var(--green-text); }
+    .fin-value.despesa { color: var(--red-text); }
+
+    .progress-bar {
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      height: 7px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width .35s ease;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+
+    .empty-state i {
+      font-size: 30px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 480px) {
+      .metrics { grid-template-columns: repeat(3,1fr); gap: 7px; }
+      .metric { padding: .6rem .75rem; }
+      .metric-value { font-size: 16px; }
+      .add-row { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <p class="header-eyebrow">Meu organizador</p>
+    <p class="header-date" id="date-display"></p>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" aria-selected="true" onclick="switchTab('tasks',this)">
+      <i class="ti ti-checklist"></i> Tarefas
+    </button>
+    <button class="tab" role="tab" aria-selected="false" onclick="switchTab('finance',this)">
+      <i class="ti ti-coin"></i> Finanças
+    </button>
+  </div>
+
+  <!-- ===== TAREFAS ===== -->
+  <div id="panel-tasks" class="panel active" role="tabpanel">
+    <div class="metrics" id="task-metrics"></div>
+
+    <div class="card">
+      <p class="section-title">Nova tarefa</p>
+      <div class="add-row">
+        <input type="text" id="task-input" placeholder="O que precisa ser feito?" onkeydown="if(event.key==='Enter')addTask()">
+        <select id="task-priority" style="max-width:110px">
+          <option value="media">Média</option>
+          <option value="alta">Alta</option>
+          <option value="baixa">Baixa</option>
+        </select>
+        <button class="btn btn-icon" onclick="addTask()" aria-label="Adicionar tarefa">
+          <i class="ti ti-plus"></i>
+        </button>
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setTaskFilter('todas',this)">Todas</button>
+        <button class="filter-btn" onclick="setTaskFilter('pendentes',this)">Pendentes</button>
+        <button class="filter-btn" onclick="setTaskFilter('concluidas',this)">Concluídas</button>
+        <button class="filter-btn" onclick="setTaskFilter('alta',this)">🔴 Alta prioridade</button>
+      </div>
+
+      <div id="task-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== FINANÇAS ===== -->
+  <div id="panel-finance" class="panel" role="tabpanel">
+    <div class="month-nav">
+      <button class="btn btn-icon" onclick="changeMonth(-1)" aria-label="Mês anterior">
+        <i class="ti ti-chevron-left"></i>
+      </button>
+      <span id="month-label"></span>
+      <button class="btn btn-icon" onclick="changeMonth(1)" aria-label="Próximo mês">
+        <i class="ti ti-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="metrics" id="fin-metrics"></div>
+
+    <div class="card">
+      <p class="section-title">Adicionar lançamento</p>
+      <div class="add-row">
+        <input type="text" id="fin-desc" placeholder="Descrição" style="min-width:130px">
+        <input type="number" id="fin-val" placeholder="Valor (R$)" style="max-width:130px" min="0" step="0.01">
+        <select id="fin-type" onchange="updateCategories()" style="max-width:110px">
+          <option value="despesa">Despesa</option>
+          <option value="receita">Receita</option>
+        </select>
+        <select id="fin-cat" style="max-width:140px"></select>
+        <button class="btn btn-icon" onclick="addFin()" aria-label="Adicionar lançamento">
+          <i class="ti ti-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Lançamentos do mês</p>
+      <div id="fin-list"></div>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Distribuição por categoria</p>
+      <div id="budget-breakdown"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const DAYS   = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+
+  const CATS = {
+    despesa: ['Moradia','Alimentação','Transporte','Saúde','Lazer','Educação','Vestuário','Outros'],
+    receita: ['Salário','Freelance','Investimentos','Outros']
+  };
+
+  const CAT_ICONS = {
+    Moradia:'🏠', Alimentação:'🍽️', Transporte:'🚗', Saúde:'💊', Lazer:'🎮',
+    Educação:'📚', Vestuário:'👗', Salário:'💼', Freelance:'💻', Investimentos:'📈', Outros:'📦'
+  };
+
+  const BAR_COLORS = ['#E24B4A','#EF9F27','#378ADD','#1D9E75','#7F77DD','#D4537E','#0F6E56','#BA7517'];
+
+  let tasks = JSON.parse(localStorage.getItem('org_tasks') || '[]');
+  let fins  = JSON.parse(localStorage.getItem('org_fins')  || '[]');
+  let taskFilter = 'todas';
+
+  const now = new Date();
+  let viewMonth = now.getMonth();
+  let viewYear  = now.getFullYear();
+
+  function save() {
+    try {
+      localStorage.setItem('org_tasks', JSON.stringify(tasks));
+      localStorage.setItem('org_fins',  JSON.stringify(fins));
+    } catch(e) {}
+  }
+
+  /* ---- TABS ---- */
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  /* ---- TASKS ---- */
+  function addTask() {
+    const inp = document.getElementById('task-input');
+    const v = inp.value.trim();
+    if (!v) return;
+    tasks.push({ id: Date.now(), text: v, done: false, priority: document.getElementById('task-priority').value });
+    inp.value = '';
+    save(); renderTasks();
+  }
+
+  function toggleTask(id) {
+    const t = tasks.find(x => x.id === id);
+    if (t) t.done = !t.done;
+    save(); renderTasks();
+  }
+
+  function delTask(id) {
+    tasks = tasks.filter(x => x.id !== id);
+    save(); renderTasks();
+  }
+
+  function setTaskFilter(f, btn) {
+    taskFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTasks();
+  }
+
+  function renderTasks() {
+    const total = tasks.length;
+    const done  = tasks.filter(t => t.done).length;
+    const high  = tasks.filter(t => !t.done && t.priority === 'alta').length;
+
+    document.getElementById('task-metrics').innerHTML = `
+      <div class="metric"><div class="metric-label">Total</div><div class="metric-value">${total}</div></div>
+      <div class="metric"><div class="metric-label">Concluídas</div><div class="metric-value green">${done}</div></div>
+      <div class="metric"><div class="metric-label">Alta prioridade</div><div class="metric-value ${high > 0 ? 'red' : ''}">${high}</div></div>`;
+
+    let list = tasks;
+    if (taskFilter === 'pendentes')  list = tasks.filter(t => !t.done);
+    if (taskFilter === 'concluidas') list = tasks.filter(t =>  t.done);
+    if (taskFilter === 'alta')       list = tasks.filter(t => t.priority === 'alta' && !t.done);
+
+    const el = document.getElementById('task-list');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty-state"><i class="ti ti-checklist"></i>Nenhuma tarefa aqui</div>';
+      return;
+    }
+    el.innerHTML = list.map(t => `
+      <div class="task-item">
+        <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask(${t.id})" role="checkbox" aria-checked="${t.done}" tabindex="0">
+          ${t.done ? '<i class="ti ti-check"></i>' : ''}
+        </div>
+        <span class="task-text ${t.done ? 'done' : ''}">${escHtml(t.text)}</span>
+        <span class="priority-badge p-${t.priority}">${t.priority}</span>
+        <button class="del-btn" onclick="delTask(${t.id})" aria-label="Excluir tarefa"><i class="ti ti-trash"></i></button>
+      </div>`).join('');
+  }
+
+  /* ---- FINANCES ---- */
+  function updateCategories() {
+    const type = document.getElementById('fin-type').value;
+    document.getElementById('fin-cat').innerHTML = CATS[type].map(c => `<option>${c}</option>`).join('');
+  }
+
+  function addFin() {
+    const desc = document.getElementById('fin-desc').value.trim();
+    const val  = parseFloat(document.getElementById('fin-val').value);
+    if (!desc || isNaN(val) || val <= 0) return;
+    fins.push({
+      id: Date.now(), desc, value: val,
+      type: document.getElementById('fin-type').value,
+      cat:  document.getElementById('fin-cat').value,
+      month: viewMonth, year: viewYear
+    });
+    document.getElementById('fin-desc').value = '';
+    document.getElementById('fin-val').value  = '';
+    save(); renderFin();
+  }
+
+  function delFin(id) {
+    fins = fins.filter(x => x.id !== id);
+    save(); renderFin();
+  }
+
+  function changeMonth(d) {
+    viewMonth += d;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
+    renderFin();
+  }
+
+  function fmt(v) {
+    return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function renderFin() {
+    document.getElementById('month-label').textContent = `${MONTHS[viewMonth]} ${viewYear}`;
+
+    const mfins   = fins.filter(f => f.month === viewMonth && f.year === viewYear);
+    const receita = mfins.filter(f => f.type === 'receita').reduce((s,f) => s + f.value, 0);
+    const despesa = mfins.filter(f => f.type === 'despesa').reduce((s,f) => s + f.value, 0);
+    const saldo   = receita - despesa;
+
+    document.getElementById('fin-metrics').innerHTML = `
+      <div class="metric"><div class="metric-label">Receitas</div><div class="metric-value green">${fmt(receita)}</div></div>
+      <div class="metric"><div class="metric-label">Despesas</div><div class="metric-value red">${fmt(despesa)}</div></div>
+      <div class="metric"><div class="metric-label">Saldo</div><div class="metric-value ${saldo >= 0 ? 'green' : 'red'}">${fmt(saldo)}</div></div>`;
+
+    const listEl = document.getElementById('fin-list');
+    if (!mfins.length) {
+      listEl.innerHTML = '<div class="empty-state"><i class="ti ti-coin"></i>Nenhum lançamento neste mês</div>';
+    } else {
+      listEl.innerHTML = [...mfins].reverse().map(f => `
+        <div class="fin-item">
+          <div class="fin-icon" style="background:${f.type==='receita'?'var(--green-bg)':'var(--red-bg)'}">${CAT_ICONS[f.cat] || '📦'}</div>
+          <div class="fin-info">
+            <div class="fin-desc">${escHtml(f.desc)}</div>
+            <div class="fin-cat-label">${f.cat}</div>
+          </div>
+          <span class="fin-value ${f.type}">${f.type==='receita'?'+':'-'}${fmt(f.value)}</span>
+          <button class="del-btn" onclick="delFin(${f.id})" aria-label="Excluir lançamento"><i class="ti ti-trash"></i></button>
+        </div>`).join('');
+    }
+
+    const despCats = {};
+    mfins.filter(f => f.type === 'despesa').forEach(f => {
+      despCats[f.cat] = (despCats[f.cat] || 0) + f.value;
+    });
+
+    const bd = document.getElementById('budget-breakdown');
+    if (!Object.keys(despCats).length) {
+      bd.innerHTML = '<p style="font-size:13px;color:var(--text-tertiary);text-align:center;padding:.75rem 0">Sem despesas para exibir</p>';
+      return;
+    }
+    const sorted = Object.entries(despCats).sort((a,b) => b[1] - a[1]);
+    bd.innerHTML = sorted.map(([cat, val], i) => {
+      const pct = despesa > 0 ? Math.round(val / despesa * 100) : 0;
+      return `<div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:13px;color:var(--text-primary)">${CAT_ICONS[cat]||'📦'} ${cat}</span>
+          <span style="font-size:13px;color:var(--text-secondary)">${fmt(val)} <span style="color:var(--text-tertiary)">(${pct}%)</span></span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${BAR_COLORS[i % BAR_COLORS.length]}"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ---- INIT ---- */
+  const d = new Date();
+  document.getElementById('date-display').textContent =
+    `${DAYS[d.getDay()]}, ${d.getDate()} de ${MONTHS[d.getMonth()]} de ${d.getFullYear()}`;
+
+  updateCategories();
+  renderTasks();
+  renderFin();
+</script>
+</body>
+</html>
