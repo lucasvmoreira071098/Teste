@@ -234,6 +234,15 @@ function loadUserData() {
         renderAllTasks();
         updateBadge();
       }
+    } else {
+      // No data in Firestore — start fresh, clear localStorage
+      localStorage.clear();
+      transactions = [];
+      tasks = {d:[], w:[], m:[]};
+      renderRecent();
+      renderAllTasks();
+      updateBadge();
+      save();
     }
   });
 }
